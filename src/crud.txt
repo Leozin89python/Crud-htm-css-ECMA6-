@@ -1,0 +1,182 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+   	<title>CRUD&copy</title>
+   	<style>
+	body{
+	background-color:whitesmoke;
+	}
+	#titulo{
+	background-color:blue;
+	text-align:center;
+	color:red;
+	}
+	#data{
+	text-align:center;
+	}
+	#formulario{
+	margin-left:2em;
+	}
+	@media(max-width:800px){
+	#titulo{
+		display:flex;
+	  }
+	}
+     </style>
+   </head>
+      <body>
+   	<h1 id="titulo">CRUD html css & Ecma6</h1>
+	<form id="formulario">
+	  <label for="ipt">dados:</label>
+	  <input id="ipt" type="text" placeholder="insira os dados"></input>
+	</form>
+	<h2 id="data">dados cadastrados</h2>
+	<div id="dados"></div>
+	<script>
+
+		//carregamento da página
+
+		window.addEventListener('load', start)
+		
+		//declarando variáveis
+
+		var globalDados = [{item:'leite','valor':5.36},
+				   		   {item:'arroz','valor':8.36}]
+		var dados = document.querySelector('#dados')
+		var ul 	  = document.createElement('ul')
+		var input = document.getElementById('ipt') 
+		var form  = document.getElementById('formulario') 
+		var IsEditing = false
+		var posicao
+	
+		function start(){
+		  comportamentoDefault(form)
+		  foco(input)
+		  CapturaValor(input)
+		  exibiVetor()
+		}
+
+		// evita atualização da página
+
+		function comportamentoDefault(Objeto){
+		  Objeto.addEventListener('submit', function(event){
+		  event.preventDefault() 
+		 })
+		}
+
+  		// direciona o cursor ao input toda vez que a página recarrega
+
+		function foco(Objeto){
+		Objeto.focus()
+		}
+
+ 		 // captura e trata os valores do objeto(digitados)
+
+		function CapturaValor(Objeto){
+		Objeto.addEventListener('keyup', function(event){
+		 if(event.key === 'Enter')	{
+
+		 //obtendo conteúdo digitado
+		    var valorDigitado = event.target.value
+
+		
+		// se algun valor for digitado então inserir ou editar
+
+		    if(valorDigitado) {
+			if(IsEditing)	{
+		// editando os valores
+
+			globalDados.splice( posicao, 1, valorDigitado)
+			
+		// desativa o modo de edição
+			IsEditing = false
+			} else{
+
+		// inserção dos valores
+			globalDados.push(valorDigitado)
+			}
+		      }
+
+		// atualiza o site e exibe os valores novos no vetor
+
+			 exibiVetor()
+		    }
+		 })
+		}
+		
+		function exibiVetor()	{
+
+		// limpa o conteúdo de ul para receber novos valores
+
+		  ul.innerHTML = ''
+		  input.value  = ''
+		
+		
+		//para cada posição do vetor, executar a função percorrer
+		  globalDados.forEach(percorreVetor)
+		  dados.appendChild(ul) 
+		}
+		
+		function percorreVetor(Objeto){
+		  var li = document.createElement('li')
+			
+		  li.appendChild(Botao()) 	    //cria e adiciona o botão x na li
+		  li.appendChild(criaSpan(Objeto))  //cria e adiciona uma span na li
+		  ul.appendChild(li)		   		//adiciona li na ul
+		}
+		
+		function Botao()	{
+		  var botao = document.createElement('button')
+
+		 //adicionando classe delete button
+		  botao.classList.add('DeletButton')
+		  botao.textContent = 'x'           //adicionando conteúdo x
+
+		//retornando botão criado ao ponto de chamada desta função
+		  return botao
+		}
+		
+		function criaSpan(valor){
+		  var span = document.createElement('span')
+		  span.textContent = valor  	//adicionando o valor dentro do span
+		  span.classList.add('clicavel')
+		  span.addEventListener('click', editeDado)
+			
+		  // retornando o valor dentro do span
+		  return span
+		}	
+
+		function editeDado(e){
+		  //recuperando o valor do elemento clicado
+		  var valor = e.target.innerHTML
+
+		  var index = globalDados.indexOf(valor) //identificando indíce
+		  input.value = globalDados[index]
+		  foco(input)
+		  IsEditing = true
+		  posicao = index
+		}
+		
+		//deletando elementos clicados
+		ul.addEventListener('click', function(e)	{
+	        
+		//evento somente no clicar ao botão	  
+     		if(e.target.localName === 'button'){
+	
+         	  //capturando o valor do elemento
+		  var valor = e.srcElement.nextElementSibling.innerHTML
+		
+		  //deletando elemento de dados
+		  var index = globalDados.indexOf(valor) //identificação do incíce
+		  globalDados.splice(index, 1)
+			
+		
+		  var anterior = e.target.parentElement	
+		  anterior.remove()      //removendo elemento do site
+		  exibiVetor()		//atualiza o site com novo valor
+		  }
+		})
+
+      </script>
+   </body>
+</html>
